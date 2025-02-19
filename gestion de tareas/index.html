@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChaosPlanner</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <div id="login-form" class="container">
+            <h1>ChaosPlanner</h1>
+            <form id="login">
+                <input type="text" id="username" placeholder="Nombre de usuario" required>
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+        </div>
+
+        <div id="dashboard" class="app-container hidden">
+            <aside class="sidebar">
+                <div class="logo">
+                    <i class="fas fa-leaf"></i>
+                    <span>ChaosPlanner</span>
+                </div>
+                
+                <nav class="main-nav">
+                    <ul>
+                        <li class="active">
+                            <a href="#"><i class="fas fa-home"></i> Overview</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fas fa-tasks"></i> My Tasks</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="far fa-calendar-alt"></i> Calendar</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="projects-section">
+                    <div class="section-header">
+                        <h3>PROJECTS</h3>
+                        <button class="add-project-btn" id="add-project-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="projects-list"></ul>
+                </div>
+
+                <div class="sidebar-footer">
+                    <div class="user-profile">
+                        <img src="https://via.placeholder.com/40" alt="User Profile" id="user-avatar">
+                        <div class="user-info">
+                            <h4 id="user-name"></h4>
+                            <span>Project Manager</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <header class="top-bar">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search tasks, projects, or notes...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="notification-btn">
+                            <i class="far fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <button class="new-task-btn" id="new-task-btn">
+                            <i class="fas fa-plus"></i>
+                            New Task
+                        </button>
+                    </div>
+                </header>
+
+                <div class="page-header">
+                    <h1>Welcome back, <span id="dashboard-user-name"></span>!</h1>
+                    <p class="subtitle">Here's an overview of your tasks</p>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-list-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Tasks</span>
+                            <h3 id="total-tasks">0</h3>
+                            <div class="stat-progress">
+                                <div class="progress-bar" id="total-progress"></div>
+                                <span id="total-completed">0% completed</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon urgent">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Urgent</span>
+                            <h3 id="urgent-tasks">0</h3>
+                            <span class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="new-urgent">0 new today</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon progress">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">In Progress</span>
+                            <h3 id="in-progress-tasks">0</h3>
+                            <span class="stat-trend">
+                                <span id="due-today">0 due today</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon completed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Completed</span>
+                            <h3 id="completed-tasks">0</h3>
+                            <span class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="completed-this-week">0 this week</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="task-management">
+                    <div class="section-header">
+                        <h2>Recent Tasks</h2>
+                        <div class="view-options">
+                            <button class="active">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button>
+                                <i class="fas fa-grip-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filters-bar">
+                        <div class="search-filters">
+                            <select id="filter-project">
+                                <option value="all">All Projects</option>
+                            </select>
+                            <select id="filter-priority">
+                                <option value="all">All Priorities</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                            <select id="filter-status">
+                                <option value="all">All Status</option>
+                                <option value="todo">To Do</option>
+                                <option value="progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="view-toggles">
+                            <button id="toggle-completed" class="toggle-btn">
+                                <i class="fas fa-eye"></i>
+                                Show Completed
+                            </button>
+                            <button class="sort-btn">
+                                <i class="fas fa-sort-amount-down"></i>
+                                Sort
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tasks-container">
+                        <table class="tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" class="select-all">
+                                    </th>
+                                    <th>Task</th>
+                                    <th>Project</th>
+                                    <th>Due Date</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Assignee</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasks-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="calendar-section">
+                    <div class="section-header">
+                        <h2>Upcoming Deadlines</h2>
+                        <button class="view-calendar-btn">
+                            View Calendar
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-preview">
+                        <div id="calendar-container"></div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="new-task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Task</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="new-task-form">
+                <div class="form-group">
+                    <label for="task-name">Task Name</label>
+                    <input type="text" id="task-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-project">Project</label>
+                        <select id="task-project" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-assignee">Assignee</label>
+                        <select id="task-assignee">
+                            <option value="john">John Doe</option>
+                            <option value="jane">Jane Smith</option>
+                            <option value="mike">Mike Johnson</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-due-date">Due Date</label>
+                        <input type="date" id="task-due-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-priority">Priority</label>
+                        <select id="task-priority" required>
+                            <option value="urgent">Urgent</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Subtasks</label>
+                    <div id="subtasks-container">
+                        <div class="subtask-input">
+                            <input type="text" placeholder="Add subtask">
+                            <button type="button" class="add-subtask-btn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <div class="tags-input">
+                        <input type="text" id="task-tags" placeholder="Add tags">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="submit-btn">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
