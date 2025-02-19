@@ -27,23 +27,51 @@
                 <nav class="main-nav">
                     <ul>
                         <li class="active">
-                            <a href="#"><i class="fas fa-home"></i> Overview</a>
+                            <a href="#"><i class="fas fa-home"></i> Vista </a>
                         </li>
                         <li>
-                            <a href="#"><i class="fas fa-tasks"></i> My Tasks</a>
+                            <a href="#"><i class="fas fa-tasks"></i> Mis tareas </a>
                         </li>
                         <li>
-                            <a href="#"><i class="far fa-calendar-alt"></i> Calendar</a>
+                            <a href="#" id="sidebar-calendar">
+                                <i class="far fa-calendar-alt"></i> Calendario
+                            </a>
                         </li>
+                            <!-- Calendar Modal -->
+                            <div id="calendarModal" class="modal calendar-modal">
+                                <div class="modal-content calendar-view">
+                                    <div class="calendar-header">
+                                        <h2><i class="far fa-calendar-alt"></i>Calendario de tareas</h2>
+                                        <div class="calendar-nav">
+                                            <button class="calendar-nav-btn" onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
+                                            <span id="currentMonth"></span>
+                                            <button class="calendar-nav-btn" onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                                        </div>
+                                        <button class="close-modal" onclick="closeCalendar()">&times;</button>
+                                    </div>
+                                    <div class="calendar-grid">
+                                        <div class="calendar-weekdays">
+                                            <div>Lunes</div>
+                                            <div>Martes</div>
+                                            <div>Miercoles</div>
+                                            <div>Jueves</div>
+                                            <div>Viernes</div>
+                                            <div>Sabado</div>
+                                            <div>Domingo</div>
+                                        </div>
+                                        <div class="calendar-days" id="calendarDays"></div>
+                                    </div>
+                                </div>
+                            </div>
                         <li>
-                            <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                            <a href="#"><i class="fas fa-chart-line"></i> Análisis</a>
                         </li>
                     </ul>
                 </nav>
 
                 <div class="projects-section">
                     <div class="section-header">
-                        <h3>PROJECTS</h3>
+                        <h3>Projectos</h3>
                         <button class="add-project-btn" id="add-project-btn">
                             <i class="fas fa-plus"></i>
                         </button>
@@ -56,7 +84,7 @@
                         <img src="https://via.placeholder.com/40" alt="User Profile" id="user-avatar">
                         <div class="user-info">
                             <h4 id="user-name"></h4>
-                            <span>Project Manager</span>
+                            <span>Usuario</span>
                         </div>
                     </div>
                 </div>
@@ -69,20 +97,15 @@
                         <input type="text" placeholder="Search tasks, projects, or notes...">
                     </div>
                     <div class="header-actions">
-                        <button class="notification-btn">
-                            <i class="far fa-bell"></i>
-                            <span class="notification-badge">3</span>
-                        </button>
                         <button class="new-task-btn" id="new-task-btn">
                             <i class="fas fa-plus"></i>
-                            New Task
+                            Nueva tarea
                         </button>
                     </div>
                 </header>
-
                 <div class="page-header">
-                    <h1>Welcome back, <span id="dashboard-user-name"></span>!</h1>
-                    <p class="subtitle">Here's an overview of your tasks</p>
+                    <h1>Bienvenido,  <span id="dashboard-user-name"></span>!</h1>
+                    <p class="subtitle">Aquí hay una vista de tus tareas</p>
                 </div>
 
                 <div class="stats-container">
@@ -91,11 +114,11 @@
                             <i class="fas fa-list-check"></i>
                         </div>
                         <div class="stat-info">
-                            <span class="stat-label">Total Tasks</span>
+                            <span class="stat-label">Tareas totales</span>
                             <h3 id="total-tasks">0</h3>
                             <div class="stat-progress">
                                 <div class="progress-bar" id="total-progress"></div>
-                                <span id="total-completed">0% completed</span>
+                                <span id="total-completed">0% completado</span>
                             </div>
                         </div>
                     </div>
@@ -104,11 +127,11 @@
                             <i class="fas fa-fire"></i>
                         </div>
                         <div class="stat-info">
-                            <span class="stat-label">Urgent</span>
+                            <span class="stat-label">Urgente</span>
                             <h3 id="urgent-tasks">0</h3>
                             <span class="stat-trend up">
                                 <i class="fas fa-arrow-up"></i>
-                                <span id="new-urgent">0 new today</span>
+                                <span id="new-urgent">0 nuevo hoy/span>
                             </span>
                         </div>
                     </div>
@@ -117,10 +140,10 @@
                             <i class="fas fa-spinner"></i>
                         </div>
                         <div class="stat-info">
-                            <span class="stat-label">In Progress</span>
+                            <span class="stat-label">En Proceso</span>
                             <h3 id="in-progress-tasks">0</h3>
                             <span class="stat-trend">
-                                <span id="due-today">0 due today</span>
+                                <span id="due-today">0 hasta hoy</span>
                             </span>
                         </div>
                     </div>
@@ -129,11 +152,11 @@
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="stat-info">
-                            <span class="stat-label">Completed</span>
+                            <span class="stat-label">Completado</span>
                             <h3 id="completed-tasks">0</h3>
                             <span class="stat-trend up">
                                 <i class="fas fa-arrow-up"></i>
-                                <span id="completed-this-week">0 this week</span>
+                                <span id="completed-this-week">0 Esta semana</span>
                             </span>
                         </div>
                     </div>
@@ -141,7 +164,7 @@
 
                 <section class="task-management">
                     <div class="section-header">
-                        <h2>Recent Tasks</h2>
+                        <h2>Tareas recientes</h2>
                         <div class="view-options">
                             <button class="active">
                                 <i class="fas fa-list"></i>
@@ -155,13 +178,13 @@
                     <div class="filters-bar">
                         <div class="search-filters">
                             <select id="filter-project">
-                                <option value="all">All Projects</option>
+                                <option value="all">Todos los proyectos</option>
                             </select>
                             <select id="filter-priority">
-                                <option value="all">All Priorities</option>
-                                <option value="urgent">Urgent</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
+                                <option value="all">Todas las prioridades</option>
+                                <option value="urgent">Urgente</option>
+                                <option value="medium">Medio</option>
+                                <option value="low">Bajo</option>
                             </select>
                             <select id="filter-status">
                                 <option value="all">All Status</option>
@@ -286,7 +309,6 @@
             </form>
         </div>
     </div>
-
     <script src="app.js"></script>
 </body>
 </html>

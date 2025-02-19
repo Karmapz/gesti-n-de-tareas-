@@ -1,4 +1,5 @@
 // DOM Elements
+
 const loginForm = document.getElementById('login-form');
 const dashboard = document.getElementById('dashboard');
 const userNameDisplay = document.getElementById('dashboard-user-name');
@@ -217,19 +218,25 @@ function renderProjects() {
     projectsList.innerHTML = '';
     projects.forEach(project => {
         const li = document.createElement('li');
+        li.className = 'project-item';
         li.innerHTML = `
             <span class="project-color" style="background-color: ${project.color};"></span>
             <span class="project-name">${project.name}</span>
             <span class="project-tag">${tasks.filter(t => t.project === project.name).length} tasks</span>
+            <button class="delete-project-btn" onclick="deleteProject('${project.id}')">
+                <i class="fas fa-times"></i>
+            </button>
         `;
         projectsList.appendChild(li);
     });
 }
-
 function updateProjectSelect() {
     const projectSelects = document.querySelectorAll('#task-project, #filter-project');
     projectSelects.forEach(select => {
-        select.innerHTML = '<option value="all">All Projects</option>';
+        select.innerHTML = `
+            <option value="all">Todos los proyectos</option>
+            <option value="Sin proyecto">Sin proyecto</option>
+        `;
         projects.forEach(project => {
             const option = document.createElement('option');
             option.value = project.name;
@@ -372,10 +379,186 @@ function safeExecute(fn) {
     };
 }
 
+
 // Apply safeExecute to main functions
 renderTasks = safeExecute(renderTasks);
 renderProjects = safeExecute(renderProjects);
 updateStatistics = safeExecute(updateStatistics);
 renderCalendar = safeExecute(renderCalendar);
 
-// This completes the JavaScript file for the ChaosPlanner application
+// Añade estas funciones a tu archivo app.js
+
+async function fetchCalendarData(year = null, month = null) {
+    try {
+        let url = 'http://localhost:5000/api/calendar';
+        if (year && month) {
+            url += `?year=${year}&month=${month}`;
+        }
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching calendar data:', error);
+        return null;
+    }
+}
+
+// Agrega al state
+let currentCalendarDate = new Date();
+let isCalendarOpen = false;
+
+// Modifica renderCalendar existente
+function renderCalendar() {
+    const calendarDays = document.getElementById('calendarDays');
+    calendarDays.innerHTML = '';
+    
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+    
+    document.getElementById('currentMonth').textContent = 
+        currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    // Empty days
+    for (let i = 0; i < firstDay; i++) {
+        calendarDays.appendChild(createCalendarDay(''));
+    }
+
+    // Actual days
+    for (let day = 1; day <= lastDate; day++) {
+        const date = new Date(year, month, day);
+        const tasksForDay = getTasksForDate(date);
+        calendarDays.appendChild(createCalendarDay(day, date, tasksForDay));
+    }
+}
+
+function createCalendarDay(dayNumber, date, tasks) {
+    const dayElement = document.createElement('div');
+    dayElement.className = 'calendar-day';
+    if (dayNumber) {
+        dayElement.classList.add('has-date');
+        if (isToday(date)) dayElement.classList.add('today');
+        
+        dayElement.innerHTML = `
+            <div class="day-number">${dayNumber}</div>
+            <div class="day-tasks">
+                ${tasks.map(task => `
+                    <div class="task-dot ${task.priority}"></div>
+                `).join('')}
+            </div>
+        `;
+        
+        dayElement.addEventListener('click', () => showTasksForDate(date));
+    }
+    return dayElement;
+}
+
+function getTasksForDate(date) {
+    const dateString = date.toISOString().split('T')[0];
+    return tasks.filter(task => 
+        new Date(task.dueDate).toISOString().split('T')[0] === dateString
+    );
+}
+
+function isToday(date) {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+}
+
+// Calendar Navigation
+function prevMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+    renderCalendar();
+}
+
+// Calendar Modal
+function openCalendar() {
+    isCalendarOpen = true;
+    document.getElementById('calendarModal').style.display = 'block';
+    document.body.classList.add('blur-effect');
+    renderCalendar();
+}
+
+function closeCalendar() {
+    isCalendarOpen = false;
+    document.getElementById('calendarModal').style.display = 'none';
+    document.body.classList.remove('blur-effect');
+}
+
+// Actualiza el event listener para el botón View Calendar
+document.querySelector('.view-calendar-btn').addEventListener('click', openCalendar);
+
+// Modifica el event listener del formulario para actualizar el calendario
+document.getElementById('new-task-form').addEventListener('submit', function() {
+    if (isCalendarOpen) {
+        renderCalendar();
+    }
+});
+
+// Agrega esta función para mostrar tareas
+function showTasksForDate(date) {
+    const tasks = getTasksForDate(date);
+    const taskList = tasks.map(task => `• ${task.name} (${task.priority})`).join('\n');
+    alert(`Tasks for ${date.toLocaleDateString()}:\n\n${taskList}`);
+}
+
+// Manejar clic en el Calendar del sidebar
+document.getElementById('sidebar-calendar').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // Remover clase active de todos los items
+    document.querySelectorAll('.main-nav li').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Agregar clase active al item clickeado
+    this.parentElement.classList.add('active');
+    
+    // Abrir calendario
+    openCalendar();
+});
+
+// Actualizar estado al cerrar calendario
+function closeCalendar() {
+    isCalendarOpen = false;
+    document.getElementById('calendarModal').style.display = 'none';
+    document.body.classList.remove('blur-effect');
+    
+    // Remover clase active del ítem
+    document.querySelectorAll('.main-nav li').forEach(item => {
+        if (item.querySelector('#sidebar-calendar')) {
+            item.classList.remove('active');
+        }
+    });
+}
+
+function deleteProject(projectId) {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+
+    if (confirm(`¿Estás seguro de querer eliminar el proyecto "${project.name}"?`)) {
+        // Eliminar el proyecto
+        projects = projects.filter(p => p.id !== projectId);
+        
+        // Actualizar tareas asociadas
+        tasks.forEach(task => {
+            if (task.project === project.name) {
+                task.project = 'Sin proyecto';
+            }
+        });
+        
+        saveToLocalStorage();
+        renderProjects();
+        renderTasks();
+        updateProjectSelect();
+        updateStatistics();
+    }
+}
